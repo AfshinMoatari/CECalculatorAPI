@@ -1,0 +1,175 @@
+﻿.figures-txt, .headline-txt, .title-txt {
+    font-family: Lato;
+    letter-spacing: 0;
+    text-align: center
+}
+
+.footer-link-txt, a {
+    text-decoration: underline
+}
+
+* {
+    font-family: lato,serif
+}
+
+html {
+    -webkit-print-color-adjust: exact
+}
+
+#svgecenter {
+    margin-left: auto;
+    margin-right: auto;
+    display: block
+}
+
+.figures-txt, .headline-txt {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24px
+}
+
+.title-txt {
+    font-size: 8px;
+    font-weight: 400;
+    line-height: 12px
+}
+
+.footer-link-txt, .footer-txt {
+    height: 15px;
+    width: 136px;
+    left: 395px;
+    top: 16px;
+    color: #5f656d;
+    font-size: 14px
+}
+
+.item-counter, .state.item-counter {
+    line-height: 150%;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 8px;
+    text-align: center;
+    color: #333
+}
+
+.progressbar-container {
+    height: 77px;
+    width: 550px;
+    y: 302;
+    x: 5;
+    display: flex;
+    padding: 0 15px
+}
+
+.progressbar {
+    align-items: center;
+    place-content: center;
+    display: flex;
+    flex-wrap: nowrap;
+    background: 0 0;
+    gap: 0 2px;
+    width: 100%;
+    height: 100%
+}
+
+.bar-item {
+    flex-grow: 1;
+    height: 4px
+}
+
+.progressbar .bar-item-container:first-child .bar-item {
+    border-radius: 8px 0 0 8px
+}
+
+.progressbar .bar-item-container:last-child .bar-item {
+    border-radius: 0 8px 8px 0
+}
+
+.state.bar-item-container {
+    position: relative;
+    flex-basis: 8.6%
+}
+
+.individuals > .item-counter, .municipality > .item-counter, .production > .item-counter, .region > .item-counter, .state > .item-counter {
+    width: auto;
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0
+}
+
+.state > .bar-item {
+    position: relative;
+    background: #528de0
+}
+
+.region.bar-item-container {
+    position: relative;
+    flex-basis: 31.4%
+}
+
+.region > .bar-item {
+    position: relative;
+    background: #1f5aad
+}
+
+.municipality.bar-item-container {
+    position: relative;
+    flex-basis: 10.4%
+}
+
+.municipality > .bar-item {
+    position: relative;
+    background: #102d56
+}
+
+.production.bar-item-container {
+    position: relative;
+    flex-basis: 48.7%
+}
+
+.production > .bar-item {
+    position: relative;
+    background: #9298a0
+}
+
+.individuals.bar-item-container {
+    position: relative;
+    flex-basis: 2%
+}
+
+.individuals > .bar-item {
+    position: relative;
+    background: #fba089
+}
+
+.item-counter-text {
+    width: max-content;
+    margin: 0 auto;
+    position: relative
+}
+
+.item-line {
+    margin: 2px auto;
+    display: table
+}
+
+.item-counter.up {
+    top: -27px
+}
+
+.item-counter.down {
+    top: 6px
+}
+
+a:link, a:visited {
+    cursor: pointer
+}
+
+a {
+    fill: rgb(38,110,211)
+}
+
+    a:active, a:hover {
+        outline: rgb(38,110,211) dotted 1px
+    }

@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+	<TargetFramework>net6.0</TargetFramework>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<UserSecretsId>8e7d311f-b8e5-4c07-8ae4-7dba71856076</UserSecretsId>
+	<EnableDefaultContentItems>false</EnableDefaultContentItems>
+	</PropertyGroup>
+
+	<Target Name="CreateAppDataFolder" AfterTargets="AfterPublish">
+		<MakeDir Directories="$(PublishDir)Pod" Condition="!Exists('$(PublishDir)Pod')" />
+	</Target>
+
+	<ItemGroup>
+		<Content Include=".ebextensions\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Views\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Pod\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Chrome\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Content Remove="C:\Users\Afshin\.nuget\packages\headlesschromium.puppeteer.lambda.dotnet\1.1.0.69\contentFiles\any\netstandard2.1\aws.tar.br" />
+	  <Content Remove="C:\Users\Afshin\.nuget\packages\headlesschromium.puppeteer.lambda.dotnet\1.1.0.69\contentFiles\any\netstandard2.1\chromium.br" />
+	  <Content Remove="C:\Users\Afshin\.nuget\packages\headlesschromium.puppeteer.lambda.dotnet\1.1.0.69\contentFiles\any\netstandard2.1\swiftshader.tar.br" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Remove="Views\_CEEmail-dk.cshtml" />
+	  <None Remove="Views\_CEReport-appendix-chrome-dk.cshtml" />
+	  <None Remove="Views\_CEReport-appendix-chrome-en.cshtml" />
+	  <None Remove="Views\_CEReport-chrome-dk-new.cshtml" />
+	  <None Remove="Views\_CEReport-chrome-en-new.cshtml" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="8.1.1" />
+		<PackageReference Include="Amazon.Extensions.Configuration.SystemsManager" Version="6.0.0" />
+		<PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.300" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.304.2" />
+		<PackageReference Include="AWSSDK.SimpleEmailV2" Version="3.7.300.13" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="PDFsharp" Version="6.0.0" />
+		<PackageReference Include="PuppeteerSharp" Version="13.0.1" />
+		<PackageReference Include="System.Net.Http" Version="4.3.4" />
+	</ItemGroup>
+
+</Project>

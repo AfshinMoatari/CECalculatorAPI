@@ -1,0 +1,288 @@
+﻿@model InterventionPDFGeneratorService
+@using CEProjectServer.Model.enums;
+@using CEProjectServer.Models;
+@using CEProjectServer.Services
+@using CEProjectServer;
+@using static CEProjectServer.Model.enums.LanguagesEnum;
+@using static CEProjectServer.Model.enums.PDFReportCellEnum;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Interventions Effective Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    @if (Model.ReportPDFData != null)
+    {
+        var inputRow = Model.ReportPDFData.Rows.Where(x => x.Key.Equals("INPUT")).FirstOrDefault();
+        var valueDriversRow = Model.ReportPDFData.Rows.Where(x => x.Key.Equals("VALUE DRIVERS")).FirstOrDefault();
+        var beneficiariesRow = Model.ReportPDFData.Rows.Where(x => x.Key.Equals("BENEFICIARIES")).FirstOrDefault();
+        var valueDistributionRow = Model.ReportPDFData.Rows.Where(x => x.Key.Equals("VALUE DISTRIBUTION")).FirstOrDefault();
+        var WELLBYRow = Model.ReportPDFData.Rows.Where(x => x.Key.Equals("WELLBY")).FirstOrDefault();
+        var othersRow = Model.ReportPDFData.Rows.Where(x => x.Key.Equals("OTHERS")).FirstOrDefault();
+        var progressChart= (ProgressChart)valueDistributionRow.Value.Where(x => x.Name.Equals(@PDFReportCells.Distribution.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure;
+        var stateChartValue = (decimal)progressChart.Figure.Where(x => x.Key.Equals(@PDFReportCells.State.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Value;
+        var regionChartValue = (decimal)progressChart.Figure.Where(x => x.Key.Equals(@PDFReportCells.Region.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Value;
+        var municipalityChartValue = (decimal)progressChart.Figure.Where(x => x.Key.Equals(@PDFReportCells.Municipality.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Value;
+        var productionChartValue = (decimal)progressChart.Figure.Where(x => x.Key.Equals(@PDFReportCells.Production.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Value;
+        var isUCLA3 = inputRow.Value.Where(x => x.Name.Equals(@PDFReportCells.EffectSize.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString().ToUpperInvariant().Contains("UCLA-3");
+
+        var sum = municipalityChartValue + regionChartValue + stateChartValue + productionChartValue;
+        var barItemCounts = progressChart.Figure.Where(x => (decimal)x.Value != 0).Count();
+        var equalExtraWidth = 150 / barItemCounts;
+        var fakewidth = 550 - 150;
+        var stateChartWidth = (((decimal)stateChartValue * fakewidth) / sum) + equalExtraWidth;
+        var regionChartWidth = (((decimal)regionChartValue * fakewidth) / sum) + equalExtraWidth;
+        var municipalityChartWidth = (((decimal)municipalityChartValue * fakewidth) / sum) + equalExtraWidth;
+        var productionChartWidth = (((decimal)productionChartValue * fakewidth) / sum) + equalExtraWidth;
+
+        var isNetNegative = @valueDistributionRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.NetBenefit.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString().Contains("-");
+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg fill="none" version="1.1" viewBox="0 0 595 842" xmlns="http://www.w3.org/2000/svg">
+<rect x="-1.5" y=".5" width="594" height="841" fill="#fff"/>
+<text class="cls-29" x="440.39484" y="813.70697" fill="#232528" font-family="Lato-Regular, Lato" font-size="10px" style="isolation:isolate">Læs mere på<tspan class="cls-40" x="498.68484" y="813.70697" fill="#232528"><a href="https://ensomhedital.dk/">ensomhedital.dk</a></tspan></text>
+<text class="cls-29" x="25.484228" y="811.34741" fill="#232528" font-family="Lato-Regular, Lato" font-size="8px" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;isolation:isolate">Samtlige værdier angives i DKK</text>
+<text class="cls-29" transform="translate(0,6)" x="25.919203" y="817.50281" fill="#232528" font-family="Lato-Regular, Lato" font-size="8px" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;inline-size:278.358;isolation:isolate;white-space:pre" xml:space="preserve">
+    <tspan display="@(isUCLA3 ? "block" : "none")">
+         <tspan x="25.919203" y="817.50281">*Brugeren har selv specificeret den forventede effektstørrelse af indsatsen på </tspan><tspan x="25.919203" y="827.50281">UCLA-3-skalaen. Dette input er ikke uafhængigt valideret.</tspan>
+    </tspan>
+   </text>
+<g clip-path="url(#g)">
+<path d="m503.49 24.342v1.3524h-5.834v4.0743h4.723v1.3011h-4.723v4.1856h5.834v1.3524h-7.487v-12.266h7.487z" fill="#232528"/>
+<path d="m505.62 36.608v-8.6708h0.899c0.215 0 0.35 0.1056 0.407 0.3167l0.119 0.9416c0.373-0.4166 0.788-0.7533 1.246-1.01 0.464-0.2568 0.998-0.3852 1.602-0.3852 0.47 0 0.882 0.0799 1.238 0.2396 0.362 0.1541 0.662 0.3767 0.899 0.6677 0.243 0.2853 0.427 0.6305 0.551 1.0357 0.125 0.4051 0.187 0.8531 0.187 1.3438v5.5209h-1.509v-5.5209c0-0.6562-0.15-1.164-0.45-1.5236-0.294-0.3652-0.746-0.5478-1.356-0.5478-0.447 0-0.865 0.1084-1.255 0.3253-0.385 0.2169-0.741 0.5107-1.069 0.8816v6.3854h-1.509z" fill="#232528"/>
+<path d="m519.96 29.367c-0.068 0.1255-0.172 0.1883-0.314 0.1883-0.085 0-0.181-0.0314-0.288-0.0942-0.107-0.0627-0.24-0.1312-0.398-0.2054-0.153-0.0799-0.337-0.1512-0.552-0.214-0.214-0.0684-0.469-0.1027-0.763-0.1027-0.254 0-0.483 0.0343-0.686 0.1027-0.204 0.0628-0.379 0.1512-0.526 0.2654-0.141 0.1141-0.252 0.2482-0.331 0.4022-0.073 0.1484-0.11 0.3111-0.11 0.4879 0 0.2226 0.062 0.4081 0.187 0.5564 0.13 0.1484 0.299 0.2768 0.508 0.3852s0.447 0.2054 0.712 0.291c0.266 0.0799 0.537 0.1684 0.814 0.2654 0.283 0.0912 0.557 0.194 0.823 0.3081 0.265 0.1141 0.503 0.2568 0.712 0.428s0.376 0.3823 0.5 0.6334c0.13 0.2454 0.195 0.5421 0.195 0.8902 0 0.3994-0.07 0.7703-0.212 1.1127-0.141 0.3367-0.35 0.6306-0.627 0.8816-0.277 0.2454-0.616 0.4394-1.018 0.5821-0.401 0.1426-0.864 0.214-1.39 0.214-0.599 0-1.142-0.097-1.628-0.2911-0.486-0.1997-0.899-0.4536-1.238-0.7618l0.356-0.582c0.045-0.0742 0.099-0.1313 0.161-0.1712 0.063-0.0399 0.144-0.0599 0.246-0.0599s0.209 0.0399 0.322 0.1198 0.249 0.1684 0.407 0.2654c0.164 0.097 0.359 0.1854 0.585 0.2653 0.232 0.0799 0.52 0.1198 0.865 0.1198 0.294 0 0.551-0.037 0.772-0.1112 0.22-0.0799 0.404-0.1855 0.551-0.3167 0.147-0.1313 0.254-0.2825 0.322-0.4537 0.074-0.1712 0.11-0.3538 0.11-0.5478 0-0.2396-0.065-0.4365-0.195-0.5906-0.124-0.1598-0.291-0.2939-0.5-0.4023-0.209-0.1141-0.449-0.2111-0.721-0.291-0.265-0.0856-0.539-0.1741-0.822-0.2654-0.277-0.0913-0.551-0.194-0.822-0.3081-0.266-0.1198-0.504-0.2682-0.713-0.4451s-0.378-0.3937-0.508-0.6505c-0.125-0.2625-0.187-0.5792-0.187-0.9501 0-0.331 0.068-0.6477 0.204-0.9501 0.135-0.3082 0.333-0.5764 0.593-0.8046 0.26-0.234 0.579-0.4194 0.958-0.5564 0.379-0.1369 0.811-0.2054 1.297-0.2054 0.566 0 1.072 0.0913 1.518 0.2739 0.452 0.1769 0.842 0.4223 1.17 0.7361l-0.339 0.5564z" fill="#232528"/>
+<path d="m525.87 27.801c0.628 0 1.193 0.1055 1.696 0.3167 0.509 0.2111 0.938 0.5107 1.289 0.8987 0.356 0.3881 0.627 0.8588 0.814 1.4124 0.192 0.5477 0.288 1.1612 0.288 1.8402 0 0.6848-0.096 1.3011-0.288 1.8489-0.187 0.5478-0.458 1.0157-0.814 1.4037-0.351 0.3881-0.78 0.6877-1.289 0.8988-0.503 0.2054-1.068 0.3082-1.696 0.3082-0.627 0-1.195-0.1028-1.704-0.3082-0.503-0.2111-0.933-0.5107-1.289-0.8988-0.356-0.388-0.63-0.8559-0.822-1.4037s-0.288-1.1641-0.288-1.8489c0-0.679 0.096-1.2925 0.288-1.8402 0.192-0.5536 0.466-1.0243 0.822-1.4124 0.356-0.388 0.786-0.6876 1.289-0.8987 0.509-0.2112 1.077-0.3167 1.704-0.3167zm0 7.7377c0.848 0 1.481-0.2852 1.9-0.8559 0.418-0.5763 0.627-1.3781 0.627-2.4052 0-1.0329-0.209-1.8374-0.627-2.4138-0.419-0.5763-1.052-0.8645-1.9-0.8645-0.429 0-0.802 0.0742-1.119 0.2225-0.316 0.1484-0.582 0.3624-0.797 0.642-0.209 0.2797-0.367 0.6249-0.475 1.0357-0.101 0.4052-0.152 0.8645-0.152 1.3781s0.051 0.9729 0.152 1.3781c0.108 0.4051 0.266 0.7475 0.475 1.0271 0.215 0.2739 0.481 0.4851 0.797 0.6334 0.317 0.1484 0.69 0.2225 1.119 0.2225z" fill="#232528"/>
+<path d="m531.81 36.608v-8.6708h0.899c0.215 0 0.351 0.1056 0.407 0.3167l0.11 0.8902c0.317-0.3937 0.67-0.7161 1.06-0.9672 0.396-0.2511 0.854-0.3766 1.374-0.3766 0.582 0 1.051 0.1626 1.407 0.4879 0.362 0.3252 0.622 0.7646 0.78 1.3181 0.119-0.3138 0.274-0.5849 0.467-0.8131 0.197-0.2283 0.418-0.4166 0.661-0.5649 0.243-0.1484 0.5-0.2568 0.772-0.3253 0.277-0.0685 0.556-0.1027 0.839-0.1027 0.452 0 0.853 0.0742 1.204 0.2225 0.356 0.1427 0.656 0.3538 0.899 0.6334 0.248 0.2796 0.438 0.6249 0.568 1.0357 0.13 0.4052 0.195 0.8703 0.195 1.3952v5.5209h-1.509v-5.5209c0-0.679-0.147-1.1926-0.441-1.5407-0.294-0.3538-0.721-0.5307-1.281-0.5307-0.248 0-0.486 0.0457-0.712 0.137-0.22 0.0856-0.415 0.214-0.585 0.3852-0.169 0.1711-0.305 0.388-0.407 0.6505-0.096 0.2568-0.144 0.5564-0.144 0.8987v5.5209h-1.509v-5.5209c0-0.6962-0.139-1.2154-0.416-1.5578s-0.681-0.5136-1.212-0.5136c-0.373 0-0.721 0.1027-1.043 0.3082-0.317 0.1997-0.608 0.4736-0.873 0.8217v6.4624h-1.51z" fill="#232528"/>
+<path d="m545.74 36.608v-12.608h1.51v5.1015c0.367-0.3938 0.774-0.7076 1.22-0.9416 0.447-0.2396 0.961-0.3595 1.543-0.3595 0.469 0 0.882 0.0799 1.238 0.2397 0.362 0.1541 0.662 0.3766 0.899 0.6676 0.243 0.2853 0.427 0.6306 0.551 1.0357 0.124 0.4052 0.187 0.8531 0.187 1.3439v5.5208h-1.51v-5.5208c0-0.6563-0.15-1.1641-0.449-1.5236-0.294-0.3652-0.746-0.5478-1.356-0.5478-0.447 0-0.865 0.1084-1.255 0.3252-0.385 0.2169-0.741 0.5108-1.068 0.8816v6.3854h-1.51z" fill="#232528"/>
+<path d="m558.56 27.801c0.514 0 0.989 0.0884 1.424 0.2653 0.436 0.1712 0.811 0.4223 1.128 0.7533 0.317 0.3252 0.563 0.7304 0.738 1.2154 0.181 0.4793 0.271 1.0271 0.271 1.6435 0 0.2396-0.025 0.3994-0.076 0.4793s-0.147 0.1198-0.288 0.1198h-5.715c0.011 0.5478 0.085 1.0243 0.22 1.4294 0.136 0.4052 0.322 0.7447 0.56 1.0186 0.237 0.2682 0.52 0.4708 0.848 0.6078 0.328 0.1312 0.695 0.1968 1.102 0.1968 0.379 0 0.704-0.0428 0.975-0.1284 0.277-0.0913 0.514-0.1883 0.712-0.291s0.362-0.1969 0.492-0.2825c0.135-0.0913 0.252-0.1369 0.348-0.1369 0.124 0 0.22 0.0485 0.288 0.1455l0.424 0.5564c-0.187 0.2282-0.41 0.4279-0.67 0.5991-0.26 0.1655-0.54 0.3025-0.839 0.4109-0.294 0.1084-0.599 0.1883-0.916 0.2397-0.317 0.057-0.63 0.0856-0.941 0.0856-0.594 0-1.142-0.0999-1.645-0.2997-0.497-0.2053-0.93-0.5021-1.297-0.8902-0.362-0.3937-0.645-0.8787-0.848-1.455-0.204-0.5764-0.305-1.2383-0.305-1.9858 0-0.6049 0.09-1.1698 0.271-1.6948 0.187-0.525 0.452-0.9787 0.797-1.361 0.344-0.388 0.766-0.6905 1.263-0.9073 0.498-0.2225 1.057-0.3338 1.679-0.3338zm0.034 1.1213c-0.729 0-1.303 0.214-1.721 0.6419-0.418 0.4223-0.679 1.01-0.78 1.7633h4.671c0-0.3538-0.048-0.6762-0.144-0.9672-0.096-0.2967-0.237-0.5507-0.424-0.7618-0.186-0.2169-0.415-0.3823-0.687-0.4965-0.265-0.1198-0.571-0.1797-0.915-0.1797z" fill="#232528"/>
+<path d="m570.1 36.608c-0.215 0-0.351-0.1055-0.408-0.3167l-0.135-1.0528c-0.368 0.4508-0.789 0.8132-1.264 1.0871-0.469 0.2682-1.008 0.4023-1.619 0.4023-0.491 0-0.938-0.0942-1.339-0.2825-0.402-0.194-0.744-0.4765-1.026-0.8474-0.283-0.3709-0.5-0.8331-0.653-1.3866s-0.229-1.1898-0.229-1.9088c0-0.6391 0.084-1.2326 0.254-1.7803 0.17-0.5536 0.413-1.0329 0.73-1.438 0.322-0.4052 0.711-0.7219 1.169-0.9502 0.458-0.2339 0.978-0.3509 1.56-0.3509 0.526 0 0.975 0.0913 1.348 0.2739 0.373 0.1769 0.707 0.428 1.001 0.7532v-4.8104h1.509v12.608h-0.898zm-2.926-1.1127c0.492 0 0.922-0.1141 1.289-0.3424 0.373-0.2282 0.715-0.5506 1.026-0.9672v-4.1941c-0.277-0.3767-0.582-0.6392-0.916-0.7875-0.328-0.1541-0.692-0.2311-1.093-0.2311-0.803 0-1.419 0.2881-1.849 0.8645-0.429 0.5763-0.644 1.398-0.644 2.4651 0 0.5649 0.048 1.05 0.144 1.4551 0.096 0.3995 0.237 0.7304 0.424 0.9929 0.186 0.2568 0.415 0.4451 0.687 0.5649 0.271 0.1199 0.582 0.1798 0.932 0.1798z" fill="#232528"/>
+<path d="m504.84 48.313v5.9588h-1.047v-5.9588h1.047zm0.235-1.8706c0 0.102-0.022 0.198-0.065 0.2882-0.039 0.0863-0.094 0.1647-0.164 0.2353-0.067 0.0667-0.145 0.1196-0.236 0.1588-0.09 0.0393-0.186 0.0589-0.288 0.0589s-0.198-0.0196-0.288-0.0589c-0.086-0.0392-0.165-0.0921-0.235-0.1588-0.067-0.0706-0.12-0.149-0.159-0.2353-0.039-0.0902-0.059-0.1862-0.059-0.2882s0.02-0.198 0.059-0.2882c0.039-0.0942 0.092-0.1746 0.159-0.2412 0.07-0.0706 0.149-0.1255 0.235-0.1647 0.09-0.0392 0.186-0.0588 0.288-0.0588s0.198 0.0196 0.288 0.0588c0.091 0.0392 0.169 0.0941 0.236 0.1647 0.07 0.0666 0.125 0.147 0.164 0.2412 0.043 0.0902 0.065 0.1862 0.065 0.2882z" fill="#266ED3"/>
+<path d="m512.42 41.893h-16.177v16.176h16.177v-16.176z" stroke="#266ED3"/>
+<path d="m532.27 41.646h-17.157v16.667h17.157v-16.667z" fill="#266ED3"/>
+<path d="m524.24 54.829-1.059-1.0098v-2.4118l1.059-0.9608v4.3824zm-3.549-8.6471c-0.228-0.183-0.457-0.3562-0.686-0.5196l0.686-0.5294h6.02l0.686 0.5294-0.686 0.5196h-2.5v3.9216l-1.059-0.951v-2.4215l0.578-0.5491h-3.039z" fill="#fff"/>
+<path d="m551.88 41.646h-17.156v16.667h17.156v-16.667z" fill="#266ED3"/>
+<path d="m540.83 50.362 1.059 1.0196v2.402l-1.059 0.9608v-4.3824zm4.991 4.3824-1.059-1.0098v-2.4118l1.059-0.9608v4.3824zm-3.853-4.0295c-0.229-0.1829-0.461-0.3627-0.697-0.5392l0.697-0.5196h2.676l0.686 0.5196-0.686 0.5392h-2.676zm-0.853-5.5h4.382l-0.971 1.0589h-2.402l-1.009-1.0589zm-0.314 4.804v-4.3824l1.059 0.951v2.4314l-1.059 1zm4.99-4.3824v4.3824l-1.059-0.951v-2.4216l1.059-1.0098z" fill="#fff"/>
+<path d="m571 41.646h-16.667v16.667h16.667v-16.667z" fill="#266ED3"/>
+<path d="m560.63 54.75 1.01-1.0589h2.422l0.96 1.0589h-4.392zm-0.284-4.8138 1.049 1.0196v2.402l-1.049 0.9608v-4.3824zm-0.03-0.3431v-4.3824l1.05 0.951v2.4314l-1.05 1z" fill="#fff"/>
+</g>
+<rect x="24.5" y="74.814" width="546" height="43" rx="3.5" fill="#F1F2F3"/>
+<rect x="24.5" y="74.814" width="546" height="43" rx="3.5" stroke="#C9CBCF"/>
+<rect x="205.67" y="74.314" width="1" height="44" fill="#C9CBCF"/>
+<rect x="388.33" y="74.314" width="1" height="44" fill="#C9CBCF"/>
+<rect x="24.533" y="130.81" width="546" height="58" rx="3.5" fill="#e9f1fb"/>
+<text class="cls-23" x="297.42114" y="150.41081" fill="#232528" font-family="Lato-Bold, Lato" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">Økonomiske gevinster, i alt</tspan></text>
+<rect x="24.5" y="130.81" width="546" height="58" rx="3.5" stroke="#A9C6EF"/>
+<line x1="24" x2="199" y1="204.31" y2="204.31" stroke="#ADB1B8" stroke-dasharray="2 2"/>
+<line x1="396" x2="571" y1="204.31" y2="204.31" stroke="#ADB1B8" stroke-dasharray="2 2"/>
+<rect x="24.5" y="220.81" width="546" height="130" rx="3.5" fill="#E9F1FB"/>
+<rect x="24.5" y="220.81" width="546" height="130" rx="3.5" stroke="#A9C6EF"/>
+<path d="m123.11 256.82c1.094 1.055 1.719 2.5 1.719 4.024 0 1.25-0.43 2.383-1.133 3.359-0.117 0.156-0.312 0.234-0.508 0.234h-5l-0.859-1.718-1.953 3.906c-0.234 0.469-0.938 0.43-1.133-0.039l-2.226-4.922-1.211 2.773h-4.375c-0.196 0-0.391-0.078-0.508-0.234-0.703-0.976-1.094-2.109-1.094-3.359 0-1.524 0.586-2.969 1.68-4.024 1.758-1.718 3.672-1.758 4.14-1.758 0.508 0 2.422 0.04 4.18 1.758 1.719-1.718 3.633-1.758 4.141-1.758 0.507 0 2.382 0.04 4.14 1.758zm-0.234 6.367c0.351-0.546 1.68-3.203-0.703-5.585-0.899-0.86-2.031-1.29-3.203-1.29-1.25 0-1.993 0.118-4.141 2.227-2.031-1.992-2.852-2.227-4.18-2.227-1.132 0-2.304 0.43-3.203 1.29-2.383 2.343-1.054 5-0.703 5.585h3.281l1.407-3.359c0.195-0.508 0.898-0.508 1.132 0l2.266 5.039 1.914-3.828c0.234-0.469 0.899-0.469 1.133 0l1.094 2.148h3.906zm-2.031 2.5c0.547 0 0.82 0.665 0.429 1.055l-5.078 5.274c-0.742 0.703-1.914 0.703-2.656 0l-5.195-5.274c-0.391-0.39-0.078-1.055 0.468-1.055 0.157 0 0.313 0.079 0.43 0.196l5.195 5.234c0.235 0.235 0.625 0.235 0.86 0l5.078-5.273c0.117-0.117 0.312-0.157 0.469-0.157z" fill="#266ED3"/>
+<rect x="205.67" y="220.31" width="1" height="131" fill="#A9C6EF"/>
+<path d="m297.46 255.06c-4.805 0-8.75 3.946-8.75 8.75 0 4.844 3.945 8.75 8.75 8.75 3.75 0 6.914-2.304 8.203-5.585 0.117-0.313 0.469-0.469 0.781-0.352 0.352 0.117 0.508 0.469 0.352 0.82-1.445 3.711-5.078 6.367-9.297 6.367-5.547 0-10-4.453-10-10 0-5.507 4.453-10 10-10 3.242 0 6.172 1.602 7.969 4.024 0.234 0.273 0.156 0.664-0.117 0.859-0.274 0.235-0.664 0.157-0.86-0.117-1.601-2.109-4.14-3.516-6.992-3.516h-0.039zm4.492 14.258c-0.273 0.196-0.664 0.196-0.898-0.078-0.703-0.82-1.875-1.68-3.594-1.68-1.68 0-2.852 0.86-3.555 1.68-0.234 0.274-0.625 0.274-0.898 0.078-0.274-0.234-0.274-0.625-0.078-0.898 0.898-1.016 2.382-2.11 4.531-2.11 0.547 0 1.016 0.079 1.484 0.196l5.899-5.664c0.781-0.742 1.992-0.742 2.734 0.039 0.781 0.742 0.781 2.031-0.039 2.773l-5.391 5.117c0.04 0.196-0.039 0.391-0.195 0.547zm-0.547-1.523 0.313-0.313-0.196-0.195c-0.195-0.195-0.195-0.469 0-0.664 0.196-0.195 0.469-0.195 0.665 0l0.195 0.195 0.625-0.547-0.235-0.234c-0.195-0.195-0.195-0.469 0-0.664 0.196-0.195 0.469-0.195 0.665 0l0.234 0.234 0.625-0.547-0.274-0.273c-0.195-0.195-0.195-0.469 0-0.664 0.196-0.195 0.469-0.195 0.665 0l0.273 0.273 0.586-0.586-0.274-0.273c-0.195-0.195-0.195-0.469 0-0.664 0.196-0.195 0.469-0.195 0.665 0l0.312 0.312 0.43-0.429c0.312-0.274 0.312-0.742 0.039-1.016-0.274-0.273-0.703-0.273-0.977 0l-5.508 5.274c0.43 0.234 0.821 0.507 1.172 0.781zm-7.968-5.86c0-0.507 0.429-0.937 0.937-0.937s0.937 0.43 0.937 0.937c0 0.547-0.429 0.938-0.937 0.938s-0.937-0.391-0.937-0.938zm8.124 0c0 0.547-0.429 0.938-0.937 0.938s-0.937-0.391-0.937-0.938c0-0.507 0.429-0.937 0.937-0.937s0.937 0.43 0.937 0.937z" fill="#266ED3"/>
+<rect x="388.33" y="220.31" width="1" height="131" fill="#A9C6EF"/>
+<path d="m487.66 257.56c1.367 0 2.5 1.133 2.5 2.5v10c0 1.407-1.133 2.5-2.5 2.5h-15c-1.406 0-2.5-1.093-2.5-2.5v-10c0-1.367 1.094-2.5 2.5-2.5h2.5v-1.875c0-1.015 0.82-1.875 1.875-1.875h6.25c1.016 0 1.875 0.86 1.875 1.875v1.875h2.5zm-11.25-1.875v1.875h7.5v-1.875c0-0.312-0.312-0.625-0.625-0.625h-6.25c-0.351 0-0.625 0.313-0.625 0.625zm12.5 14.375v-5h-5.625v2.5c0 0.352-0.312 0.625-0.625 0.625h-5c-0.352 0-0.625-0.273-0.625-0.625v-2.5h-5.625v5c0 0.704 0.547 1.25 1.25 1.25h15c0.664 0 1.25-0.546 1.25-1.25zm-10.625-3.125h3.75v-1.875h-3.75v1.875zm10.625-3.125v-3.75c0-0.664-0.586-1.25-1.25-1.25h-15c-0.703 0-1.25 0.586-1.25 1.25v3.75h17.5z" fill="#266ED3"/>
+<line x1="24" x2="198.5" y1="366.31" y2="366.31" stroke="#ADB1B8" stroke-dasharray="2 2"/>
+<line x1="396.5" x2="571" y1="366.31" y2="366.31" stroke="#ADB1B8" stroke-dasharray="2 2"/>
+<g clip-path="url(#h)">
+<mask id="i" fill="white">
+<path d="m24 386.31c0-2.209 1.7909-4 4-4h539c2.209 0 4 1.791 4 4v24h-547v-24z"/>
+</mask>
+<path d="m24 386.31c0-2.209 1.7909-4 4-4h539c2.209 0 4 1.791 4 4v24h-547v-24z" fill="#E9F1FB"/>
+<rect transform="translate(24 382.31)" width="410" height="28" fill="#A9C6EF"/>
+<mask id="j" x="433" y="382.313" width="138" height="28" fill="black" maskUnits="userSpaceOnUse">
+<rect x="433" y="382.31" width="138" height="28" fill="#fff"/>
+<path d="m434 382.31h137v28h-137v-28z"/>
+</mask>
+<path d="m434 382.31h137v28h-137v-28z" fill="#C9CBCF"/>
+<path d="m435 410.31v-28h-2v28h2z" fill="#C9CBCF" mask="url(#j)"/>
+</g>
+<path d="m23 386.31c0-2.761 2.2386-5 5-5h539c2.761 0 5 2.239 5 5h-2c0-1.656-1.343-3-3-3h-539c-1.6569 0-3 1.344-3 3h-2zm548 24h-547 547zm-548 0v-24c0-2.761 2.2386-5 5-5v2c-1.6569 0-3 1.344-3 3v24h-2zm544-29c2.761 0 5 2.239 5 5v24h-2v-24c0-1.656-1.343-3-3-3v-2z" fill="#A9C6EF" mask="url(#i)"/>
+<path d="m24.5 410.81h546v130h-546v-130z" fill="#E9F1FB"/>
+<path d="m24.5 410.81h546v130h-546v-130z" stroke="#A9C6EF"/>
+<path transform="translate(0, 10)" d="m101.25 449.05c0.352 0.234 0.625 0.625 0.625 1.055 0 0.664-0.547 1.21-1.25 1.21h-17.539c-0.7031 0-1.2109-0.546-1.2109-1.21 0-0.43 0.2344-0.821 0.5859-1.055l9.1016-5.117c0.1953-0.118 0.3906-0.118 0.5859 0l9.1016 5.117zm-18.047 1.015h17.305l-8.633-4.882-8.6719 4.882zm1.1719 7.5v-5h1.25v5h3.125v-5h1.25v5h3.75v-5h1.25v5h3.125v-5h1.25v5c0.3125 0 0.625 0.313 0.625 0.625 0 0.352-0.3125 0.625-0.625 0.625h-15c-0.3516 0-0.625-0.273-0.625-0.625 0-0.312 0.2734-0.625 0.625-0.625zm-1.5625 3.125c0-0.312 0.2734-0.625 0.625-0.625h16.874c0.313 0 0.626 0.313 0.626 0.625 0 0.352-0.313 0.625-0.626 0.625h-16.874c-0.3516 0-0.625-0.273-0.625-0.625zm-0.9375 2.5c0-0.312 0.2734-0.625 0.625-0.625h18.75c0.312 0 0.625 0.313 0.625 0.625 0 0.352-0.313 0.625-0.625 0.625h-18.75c-0.3516 0-0.625-0.273-0.625-0.625z" fill="#102D56"/>
+<rect x="159.75" y="410.31" width="1" height="131" fill="#A9C6EF"/>
+<path d="m238 461.05c0.352 0.234 0.625 0.625 0.625 1.055 0 0.664-0.547 1.21-1.25 1.21h-17.539c-0.703 0-1.211-0.546-1.211-1.21 0-0.43 0.234-0.821 0.586-1.055l9.101-5.117c0.196-0.118 0.391-0.118 0.586 0l9.102 5.117zm-0.742 1.015-8.633-4.882-8.672 4.882h6.68c-0.156-0.273-0.195-0.585-0.195-0.937 0-1.172 0.976-2.188 2.187-2.188 1.172 0 2.187 1.016 2.187 2.188 0 0.352-0.078 0.664-0.234 0.937h6.68zm-8.633 0c0.508 0 0.937-0.39 0.937-0.937 0-0.508-0.429-0.938-0.937-0.938-0.547 0-0.937 0.43-0.937 0.938 0 0.547 0.39 0.937 0.937 0.937zm-7.5 2.5h1.25v5h3.125v-5h1.25v5h3.75v-5h1.25v5h3.125v-5h1.25v5c0.313 0 0.625 0.313 0.625 0.625 0 0.352-0.312 0.625-0.625 0.625h-15c-0.352 0-0.625-0.273-0.625-0.625 0-0.312 0.273-0.625 0.625-0.625v-5zm15.937 7.5c0.313 0 0.626 0.313 0.626 0.625 0 0.352-0.313 0.625-0.626 0.625h-16.874c-0.352 0-0.626-0.273-0.626-0.625 0-0.312 0.274-0.625 0.626-0.625h16.874zm0.938 2.5c0.312 0 0.625 0.313 0.625 0.625 0 0.352-0.313 0.625-0.625 0.625h-18.75c-0.352 0-0.625-0.273-0.625-0.625 0-0.312 0.273-0.625 0.625-0.625h18.75z" fill="#1F5AAD"/>
+<rect x="296.5" y="410.31" width="1" height="131" fill="#A9C6EF"/>
+<path d="m369.12 459.56h-3.125v1.25h7.5c0.312 0 0.625 0.313 0.625 0.625 0 0.352-0.313 0.625-0.625 0.625h-16.25c-0.352 0-0.625-0.273-0.625-0.625 0-0.312 0.273-0.625 0.625-0.625h7.5v-4.375c0-0.312 0.273-0.625 0.625-0.625h3.75c0.313 0 0.625 0.313 0.625 0.625v2.5c0 0.352-0.312 0.625-0.625 0.625zm-3.125-1.25h2.5v-1.25h-2.5v1.25zm-8.75 11.875c0-0.312 0.273-0.625 0.625-0.625v-6.25h1.25v6.25h3.125v-6.25h1.25v6.25h3.75v-6.25h1.25v6.25h3.125v-6.25h1.25v6.25c0.313 0 0.625 0.313 0.625 0.625 0 0.352-0.312 0.625-0.625 0.625h-15c-0.352 0-0.625-0.273-0.625-0.625zm-0.938 2.5c0-0.312 0.274-0.625 0.626-0.625h16.874c0.313 0 0.626 0.313 0.626 0.625 0 0.352-0.313 0.625-0.626 0.625h-16.874c-0.352 0-0.626-0.273-0.626-0.625zm-0.937 2.5c0-0.312 0.273-0.625 0.625-0.625h18.75c0.312 0 0.625 0.313 0.625 0.625 0 0.352-0.313 0.625-0.625 0.625h-18.75c-0.352 0-0.625-0.273-0.625-0.625z" fill="#528DE0"/>
+<rect x="433.25" y="410.31" width="1" height="131" fill="#C9CBCF"/>
+<mask id="k" fill="white">
+<path d="m434.25 410.31h135.75v131h-135.75v-131z"/>
+</mask>
+<path d="m434.25 410.31h135.75v131h-135.75v-131z" fill="#F1F2F3"/>
+<path d="m434.25 411.31h135.75v-2h-135.75v2zm135.75 129h-135.75v2h135.75v-2z" fill="#C9CBCF" mask="url(#k)"/>
+<path d="m493.38 457.06h2.5c0.664 0 1.25 0.586 1.25 1.25v5.938l6.094-3.281c0.625-0.352 1.406 0.078 1.406 0.82v2.461l6.094-3.281c0.625-0.352 1.406 0.078 1.406 0.82v10.898c0 1.055-0.859 1.875-1.875 1.875h-16.25c-1.055 0-1.875-0.82-1.875-1.875v-14.375c0-0.664 0.547-1.25 1.25-1.25z" fill="#9298A0"/>
+<rect x="570" y="410.31" width="1" height="131" fill="#A9C6EF"/>
+<mask id="l" fill="white">
+<path d="m24 541.31h547v95c0 2.21-1.791 4-4 4h-539c-2.2091 0-4-1.79-4-4v-95z"/>
+</mask>
+<path d="m24 541.31h547v95c0 2.21-1.791 4-4 4h-539c-2.2091 0-4-1.79-4-4v-95z" fill="#E9F1FB"/>
+<path d="m24 541.31h547-547zm548 95c0 2.762-2.239 5-5 5h-539c-2.7614 0-5-2.238-5-5h2c0 1.657 1.3431 3 3 3h539c1.657 0 3-1.343 3-3h2zm-544 5c-2.7614 0-5-2.238-5-5v-95h2v95c0 1.657 1.3431 3 3 3v2zm544-100v95c0 2.762-2.239 5-5 5v-2c1.657 0 3-1.343 3-3v-95h2z" fill="#A9C6EF" mask="url(#l)"/>
+<line x1="24" x2="203" y1="655.31" y2="655.31" stroke="#ADB1B8" stroke-dasharray="2 2"/>
+<line x1="392" x2="571" y1="655.31" y2="655.31" stroke="#ADB1B8" stroke-dasharray="2 2"/>
+<rect x="24.5" y="671.81" width="266.5" height="114.69" rx="3.5" fill="#DEEDE9"/>
+<rect x="24.5" y="671.81" width="266.5" height="114.69" rx="3.5" stroke="#BEDAD4"/>
+<path d="m157.75 724.66c-6.656 0-12-5.344-12-12 0-6.609 5.344-12 12-12 6.609 0 12 5.391 12 12 0 6.656-5.391 12-12 12zm-4.312-8.718c-0.282-0.329-0.75-0.329-1.079-0.094-0.328 0.281-0.328 0.75-0.093 1.078 1.078 1.219 2.859 2.484 5.484 2.484 2.578 0 4.359-1.265 5.438-2.484 0.234-0.328 0.234-0.797-0.094-1.078-0.328-0.235-0.797-0.235-1.078 0.094-0.797 0.984-2.25 1.968-4.266 1.968-2.062 0-3.469-0.984-4.312-1.968zm2.062-5.532c0-0.797-0.656-1.5-1.5-1.5s-1.5 0.703-1.5 1.5c0 0.844 0.656 1.5 1.5 1.5s1.5-0.656 1.5-1.5zm6 1.5c0.844 0 1.5-0.656 1.5-1.5 0-0.797-0.656-1.5-1.5-1.5s-1.5 0.703-1.5 1.5c0 0.844 0.656 1.5 1.5 1.5z" fill="#498375"/>
+<rect x="304" y="671.81" width="266.5" height="114.69" rx="3.5" fill="#DEEDE9"/>
+<rect x="304" y="671.81" width="266.5" height="114.69" rx="3.5" stroke="#BEDAD4"/>
+<path d="m429.75 711.16c-1.266 0-2.25-0.984-2.25-2.25 0-1.218 0.984-2.25 2.25-2.25 1.219 0 2.25 1.032 2.25 2.25 0 1.266-1.031 2.25-2.25 2.25zm-0.375 18c0 0.844-0.703 1.5-1.5 1.5-0.844 0-1.5-0.656-1.5-1.5v-10.453l-1.359 2.25c-0.422 0.703-1.36 0.938-2.063 0.516s-0.937-1.36-0.515-2.063l2.718-4.547c0.844-1.359 2.297-2.203 3.891-2.203h1.359c1.594 0 3.047 0.844 3.891 2.203l2.719 4.547c0.14 0.235 0.187 0.469 0.234 0.75 0-0.281 0.047-0.515 0.188-0.75l2.531-4.172c0.937-1.593 2.625-2.578 4.5-2.578h0.515c1.875 0 3.563 0.985 4.5 2.578l2.532 4.172c0.422 0.703 0.187 1.641-0.516 2.063s-1.641 0.187-2.062-0.516l-1.594-2.625 1.828 5.344c0.14 0.516-0.234 0.984-0.75 0.984h-0.797v4.5c0 0.844-0.703 1.5-1.5 1.5-0.844 0-1.5-0.656-1.5-1.5v-4.5h-0.75v4.5c0 0.844-0.703 1.5-1.5 1.5-0.844 0-1.5-0.656-1.5-1.5v-4.5h-0.844c-0.515 0-0.89-0.468-0.703-0.984l1.781-5.344-1.593 2.625c-0.422 0.703-1.36 0.938-2.063 0.516-0.469-0.281-0.703-0.75-0.703-1.266-0.047 0.516-0.281 0.985-0.75 1.266-0.703 0.422-1.641 0.187-2.062-0.516l-1.313-2.25v10.453c0 0.844-0.703 1.5-1.5 1.5-0.844 0-1.5-0.656-1.5-1.5v-6h-0.75v6zm17.625-20.25c0 1.266-1.031 2.25-2.25 2.25-1.266 0-2.25-0.984-2.25-2.25 0-1.218 0.984-2.25 2.25-2.25 1.219 0 2.25 1.032 2.25 2.25z" fill="#498375"/>
+<text class="cls-29" x="211.32346" y="207.77525" fill="#232528" font-family="Lato-Regular, Lato" font-size="10px" style="isolation:isolate"><tspan x="211.32346" y="207.77525">ØKONOMISKE GEVINSTKATEGORIER</tspan></text>
+<text class="cls-29" x="210.5018" y="370.2294" fill="#232528" font-family="Lato-Regular, Lato" font-size="10px" style="isolation:isolate"><tspan x="210.5018" y="370.2294">ØKONOMISKE GEVINSTMODTAGERE</tspan></text>
+<text class="cls-29" x="254.50864" y="659.29102" fill="#232528" font-family="Lato-Regular, Lato" font-size="10px" style="isolation:isolate"><tspan x="254.50864" y="659.29102">LIVSTILFREDSHED</tspan></text>
+<g fill="#242629">
+<text class="cls-23" x="301.52847" y="93.83033" fill-rule="evenodd" font-family="Lato-Bold, Lato" font-size="10px" font-weight="700" style="isolation:isolate"><tspan class="cls-26" fill="#242629" fill-rule="evenodd" font-family="Lato-Bold, Lato" font-size="10px" font-weight="bold" text-align="center" text-anchor="middle" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal">Estimeret effektstørrelse<tspan display="@(isUCLA3 ? "block" : "none")">*</tspan></tspan></text>
+<text class="cls-14" x="301.36111" y="106.65656" font-family="Lato-Regular, Lato" font-size="8px" style="isolation:isolate"><tspan fill="#242629" text-align="center" text-anchor="middle">@inputRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.EffectSize.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString().Replace(",", ".")</tspan></text>
+</g>
+<g fill="#242629" fill-rule="evenodd">
+<text class="cls-18" x="480.44278" y="106.9216" font-family="Lato-Regular, Lato" font-size="8px" letter-spacing="-.02em" style="isolation:isolate"><tspan fill="#242629" fill-rule="evenodd" text-align="center" text-anchor="middle">@inputRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.Participant.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="480.57477" y="94.001595" font-family="Lato-Bold, Lato" font-size="10px" font-weight="700" style="isolation:isolate"><tspan class="cls-26" fill="#242629" fill-rule="evenodd" font-family="Lato-Bold, Lato" font-size="10px" font-weight="bold" text-align="center" text-anchor="middle" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal">Målgruppe</tspan></text>
+</g>
+<text class="cls-14" x="116.59615" y="106.14953" fill="#000000" font-family="Lato-Regular, Lato" font-size="8px" style="isolation:isolate"><tspan fill="#000000" text-align="center" text-anchor="middle">@inputRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.Type.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="115.82368" y="93.29953" fill="#242629" font-family="Lato-Bold, Lato" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#242629" text-align="center" text-anchor="middle">Indsatstype</tspan></text>
+<defs>
+<clipPath id="g">
+<rect transform="translate(496 24)" width="75" height="34.314" fill="#fff"/>
+</clipPath>
+<clipPath id="h">
+<path d="m24 386.31c0-2.209 1.7909-4 4-4h539c2.209 0 4 1.791 4 4v24h-547v-24z" fill="#fff"/>
+</clipPath>
+</defs>
+<text class="cls-19" x="24.436092" y="42.025475" fill="#232528" font-family="Lato-Bold, Lato" font-size="16px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="left" text-anchor="left">@Model.ReportPDFData.ProjectName</tspan></text>
+<g transform="translate(0 -1.697)" fill="#232528">
+<text class="cls-20" x="295.72339" y="298.50262" font-family="Lato-Bold, Lato" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@valueDriversRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.SickDays.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-20" x="298.39148" y="174.13446" fill="#232528" font-family="Lato-Bold, Lato" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@othersRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.FinancialGainsTotal.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="295.9144" y="241.19711" font-family="Lato-Bold, Lato" font-size="10px" font-weight="700" style="isolation:isolate"><tspan dominant-baseline="auto" fill="#000000" font-family="Lato-Bold, Lato" font-size="10px" font-weight="700" stop-color="#000000" text-align="center" text-anchor="middle" style="-inkscape-stroke:none;font-feature-settings:normal;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;font-variation-settings:normal;line-height:normal;text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:normal">Sygedage</tspan></text>
+<text transform="translate(-4.7837 -.14323)" dominant-baseline="auto" fill-rule="evenodd" font-family="Lato-Regular, Lato" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect38866);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="236.62758" y="315.06695">Færre omkostninger til udbetaling af </tspan><tspan x="241.36359" y="325.06695">sygedagpenge og øget produktion</tspan></text>
+</g>
+<text transform="translate(-99.311 84.213)" dominant-baseline="auto" fill="#232528" fill-rule="evenodd" font-family="Lato-Regular, Lato" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect38866-2);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="247.80397" y="315.06695">OFFENTLIG BUDGETØKONOMISK GEVINST</tspan></text>
+<text transform="translate(197.14 84.177)" dominant-baseline="auto" fill="#232528" fill-rule="evenodd" font-family="Lato-Regular, Lato" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect38866-2-2);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="249.16695" y="315.06695">ANDEN ØKONOMISK GEVINST</tspan></text>
+<g transform="translate(0 -2.375)" fill="#232528">
+<text class="cls-20" x="479.46945" y="297.18008" font-family="Lato-Bold, Lato" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@valueDriversRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.Unemployment.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="479.66046" y="241.87511" font-family="Lato-Bold, Lato" font-size="10px" font-weight="700" style="isolation:isolate"><tspan dominant-baseline="auto" fill="#000000" font-family="Lato-Bold, Lato" font-size="10px" font-weight="700" stop-color="#000000" text-align="center" text-anchor="middle" style="-inkscape-stroke:none;font-feature-settings:normal;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;font-variation-settings:normal;line-height:normal;text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:normal">Arbejdsløshed</tspan></text>
+<text transform="translate(163.8 -.14323)" dominant-baseline="auto" fill-rule="evenodd" font-family="Lato-Regular, Lato" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect38866-8);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="252.08266" y="315.06695">Færre omkostninger til udbetaling af </tspan><tspan x="235.45467" y="325.06695">kontanthjælp, dagpenge samt øget produktion</tspan></text>
+</g>
+<g fill="#232528" font-family="Lato-Bold, Lato">
+<text class="cls-20" x="116.60294" y="296.80563" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@valueDriversRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.Healthcare.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="116.69895" y="239.50015" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">Sundhedsydelser</tspan></text>
+<text transform="translate(1.2267 -4.75)" dominant-baseline="auto" fill-rule="evenodd" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect40302);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="49.904716" y="318.37555">Færre omkostninger til behandling på </tspan><tspan x="55.908707" y="328.37555">hospitaler og i almen praksis, samt </tspan><tspan x="90.472725" y="338.37555">hjemmeplejen</tspan></text>
+</g>
+<g transform="translate(-.15901 14.0466)" fill="#232528" font-family="Lato-Bold, Lato">
+<text class="cls-20" x="91.46537" y="483.7298" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@beneficiariesRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.Municipality.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="93.264366" y="428.42432" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">Kommune</tspan></text>
+<text transform="translate(-21.001 184.17)" dominant-baseline="auto" fill-rule="evenodd" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect40302-5);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="54.896721" y="318.37555">Hjemmepleje, sygedagpenge og
+</tspan><tspan x="84.080719" y="328.37555">kontanthjælp
+</tspan></text>
+</g>
+<g transform="translate(-147.22 239.93)">
+<g transform="translate(164.76 18.738)" fill="#232528" font-family="Lato-Bold, Lato">
+<text class="cls-20" x="138.86722" y="487.7298" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@WELLBYRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.WellbyPoint.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="138.91472" y="430.42432" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">WELLBY point pr. borger</tspan></text>
+<text class="cls-23" x="280.2977" y="303.64923" fill="#232528" font-family="Lato-Bold, Lato" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">Fordeling af økonomi blandt gevinstmodtagere</tspan></text>
+<foreignobject class="progressbar-container" y="500" width="550" height="77px">
+<div class="progressbar">
+ @if(municipalityChartValue != 0){
+<div class="municipality bar-item-container" style="@($"flex-basis: {municipalityChartWidth.ToString().Replace(",", ".")}px")">
+<div class="bar-item"></div>
+<div class="item-counter down">
+<div class="item-line">
+<svg width="1" height="8" fill="none" viewBox="0 0 1 8" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0H1V8H0V0Z" fill="#0A0812" fill-opacity=".38"/>
+</svg>
+</div>
+<p class="item-counter-text">@($"{@PDFReportCells.Municipality.GetLanguageSpecificDescription(Languages.DA)} {Math.Round(((municipalityChartValue/sum)*100), 2).ToString().Replace(",", ".")}%")</p>
+</div>
+</div>
+ }
+@if(regionChartValue != 0){
+<div class="region bar-item-container" style="@($"flex-basis: {regionChartWidth.ToString().Replace(",", ".")}px")">
+<div class="bar-item"></div>
+<div class="item-counter up">
+<p class="item-counter-text">@($"{@PDFReportCells.Region.GetLanguageSpecificDescription(Languages.DA)} {Math.Round(((regionChartValue/sum)*100), 2).ToString().Replace(",", ".")}%")</p>
+<div class="item-line">
+<svg width="1" height="8" fill="none" viewBox="0 0 1 8" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0H1V8H0V0Z" fill="#0A0812" fill-opacity=".38"/>
+</svg>
+</div>
+</div>
+</div>
+}
+@if(stateChartValue != 0){
+<div class="state bar-item-container" style="@($"flex-basis: {stateChartWidth.ToString().Replace(",", ".")}px")">
+<div class="bar-item"></div>
+<div class="item-counter down">
+<div class="item-line">
+<svg width="1" height="8" fill="none" viewBox="0 0 1 8" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0H1V8H0V0Z" fill="#0A0812" fill-opacity=".38"/>
+</svg>
+</div>
+<p class="item-counter-text">@($"{@PDFReportCells.State.GetLanguageSpecificDescription(Languages.DA)} {Math.Round(((stateChartValue/sum) * 100), 2).ToString().Replace(",", ".")}%")</p>
+</div>
+</div>
+}
+@if(productionChartValue != 0){
+<div class="production bar-item-container" style="@($"flex-basis: {productionChartWidth.ToString().Replace(",", ".")}px")">
+<div class="bar-item"></div>
+<div class="item-counter up">
+<p class="item-counter-text">@($"{@PDFReportCells.Production.GetLanguageSpecificDescription(Languages.DA)} {Math.Round(((productionChartValue/sum)*100), 2)}%")</p>
+<div class="item-line">
+<svg width="1" height="8" fill="none" viewBox="0 0 1 8" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0H1V8H0V0Z" fill="#0A0812" fill-opacity=".38"/>
+</svg>
+</div>
+</div>
+</div>
+}
+</div>
+</foreignobject>
+<text transform="translate(-21.001 186.17)" dominant-baseline="auto" fill-rule="evenodd" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect40302-5-4);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="46.112564" y="318.37555">Øget WELLBY point (livstilfredshed målt på en skala fra 0-10) ved </tspan><tspan x="122.61257" y="328.37555">reduceret ensomhed.</tspan></text>
+</g>
+</g>
+<g transform="translate(400.25 248.61)">
+<g transform="translate(164.76 18.738)" fill="#232528" font-family="Lato-Bold, Lato">
+<text class="cls-20" x="-128.31927" y="483.3548" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@WELLBYRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.WellbySocialValueTotal.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="-128.34679" y="426.04932" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">Monetær værdi af øget livstilfredshed</tspan></text>
+<text transform="translate(-287.81 181.8)" dominant-baseline="auto" fill-rule="evenodd" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect40302-5-4-9);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="58.016556" y="318.37555">Teoretisk værdi af øget livstilfredshed for hele målgruppen</tspan></text>
+</g>
+</g>
+<g transform="translate(-184.48 .33461)">
+<g transform="translate(-19.5 128.5)">
+<g transform="translate(338.5,-116)" fill="#232528" font-family="Lato-Bold, Lato">
+<text class="cls-20" x="94.381371" y="487.7298" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@beneficiariesRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.Region.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="94.28537" y="430.42432" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">Region</tspan></text>
+<text transform="translate(-21.001 186.17)" dominant-baseline="auto" fill-rule="evenodd" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect40302-5-6);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="57.012703" y="318.37555">Behandling i praksis og hospitaler</tspan></text>
+</g>
+</g>
+</g>
+<g transform="translate(-534.31 -5.7005)">
+<g transform="translate(-19.5 128.5)">
+<g transform="translate(338.5,-116)">
+<g transform="translate(486.84 5.9301)" fill="#232528" font-family="Lato-Bold, Lato">
+<text class="cls-20" x="94.381371" y="487.7298" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@beneficiariesRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.State.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="94.395363" y="430.42432" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">Stat</tspan></text>
+<text transform="translate(-20.927 186.17)" dominant-baseline="auto" fill-rule="evenodd" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect40302-5-6-5);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="97.38472" y="318.37555">Dagpenge</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<g transform="translate(-959.74 .0078621)">
+<g transform="translate(-19.5 128.5)">
+<g transform="translate(338.5,-116)">
+<g transform="translate(486.84 5.9301)">
+<g transform="translate(561.54 -5.5884)" fill="#232528" font-family="Lato-Bold, Lato">
+<text class="cls-20" x="94.447372" y="487.7298" font-size="14px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">@beneficiariesRow.Value.Where(x =>x.Name.Equals(@PDFReportCells.Production.GetLanguageSpecificDescription(Languages.DA))).FirstOrDefault().Figure.ToString()</tspan></text>
+<text class="cls-23" x="94.351372" y="430.42432" font-size="10px" font-weight="700" style="isolation:isolate"><tspan fill="#232528" text-align="center" text-anchor="middle">Produktion</tspan></text>
+<text transform="translate(-20.927 186.17)" dominant-baseline="auto" fill-rule="evenodd" font-size="8px" stop-color="#000000" text-align="center" style="-inkscape-stroke:none;font-variant-alternates:normal;font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;line-height:normal;shape-inside:url(#rect40302-5-6-5-8);text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:pre" xml:space="preserve"><tspan x="79.196739" y="318.37555">Bruttoværditilvækst</tspan></text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</svg>
+    }
+</body>
+</html>

@@ -1,0 +1,2 @@
+CEProjectServer/Chrome/chrome.dll filter=lfs diff=lfs merge=lfs -text
+CEProjectServer/Chrome/interactive_ui_tests.exe filter=lfs diff=lfs merge=lfs -text
